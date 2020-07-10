@@ -9,6 +9,12 @@ const games = [
     {title: 'Unravel Two', developer: 'Coldwood Interactive', genre: 'Puzzle-platformer', year: 2018}
 ];
 
+function listGames() {
+    
+}
+
+const gamesList = listGames();
+
 // Returns all items in the array
 exports.getAll = function() {
     return games;
