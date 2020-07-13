@@ -9,13 +9,14 @@ const games = [
     {title: 'Unravel Two', developer: 'Coldwood Interactive', genre: 'Puzzle-platformer', year: 2018}
 ];
 
-function listGames() {
-    
-}
-
-const gamesList = listGames();
-
 // Returns all items in the array
-exports.getAll = function() {
+exports.getAll = () => {
     return games;
+};
+
+/* Returns a specific item from the array and its details
+The search term for [title] is passed and the return value is the item with the matching title */
+exports.getGame = (titleSearch) => {
+    var game = games.find(games => games.title === titleSearch);
+    return game;
 };

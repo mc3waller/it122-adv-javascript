@@ -1,0 +1,23 @@
+<title>Example App</title>
+
+    <h1>Game Details</h1>
+
+    {{!-- Display the [title] value of the visited array item --}}
+    <h3>{{title}}</h3>
+
+        {{!-- If the requested game item exists ...
+        Create a list displaying each of its properties; otherwise, show an error --}}
+        <p>
+        {{#if game}}
+            <li><b>Title:</b> {{ game.title }}</li>
+            <li><b>Developer:</b> {{ game.developer }}</li>
+            <li><b>Genre:</b> {{game.genre}}</li>
+            <li><b>Year:</b> {{game.year}}</li>
+        {{else}}
+            Game not found!
+        {{/if}}
+        </p>
+
+<footer>
+    <a href="/">Return to Home</a>
+</footer>

@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <script src="../data.js"></script>
-    </head>
-    <body>
-        <h1>Example App: Home</h1>
-    </body>
-</html>
+<h1>Game List</h1>
+
+    {{!-- For each item in [gamesList: displayGames] ...
+    Create a list item element with the item's [title] and a link to its details page, using its [title] for the query value to get there --}}
+    <ul>
+    {{#each gamesList }}
+            <li>
+                <a href="/details?title={{ title }}">{{ title }}</a>
+            </li>
+    {{/each}}
+    </ul>
