@@ -5,11 +5,12 @@ MODULE IMPORTS
 ================================================ */
 
 // Imported modules and their reference variables
-const http = require('http');
+// const http = require('http');
 const games = require('./data');
 const express = require("express");
 const bodyParser = require("body-parser")
-let exphbs = require("express-handlebars");
+const exphbs = require("express-handlebars");
+
 
 /* =============================================
 CONFIGURATIONS & REFERENCES
@@ -30,6 +31,7 @@ app.set('port', process.env.PORT || 3000); // Use this port
 app.use(express.static(__dirname + '/public')); // Set location for static files
 app.use(bodyParser.urlencoded({extended: true})); // Parse form submissions
 
+
 /* =============================================
 HANDLEBARS ROUTING
 ================================================ */
@@ -48,36 +50,38 @@ app.get('/details', (req, res) => {
   res.render('details', {title: req.query.title, game: result});
 });
 
+
 /* =============================================
 GENERAL ROUTING - EXPRESS
 ================================================ */
 
 // Send static file as response
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
   res.type('text/html');
   res.sendFile(__dirname + '/public/home.html'); 
  });
 
 // Send plain text response
-app.get('/about', function(req, res) {
+app.get('/about', (req, res) => {
   res.type('text/plain');
   res.send("About page\n" + "My name is Malik and I'm in my second year at SCC, slowly but surely grinding away for that programming certificate.");
  });
 
 // Define 404 handler, responding to all other requests
-app.use( function(req, res) {
+app.use( (req, res) => {
   res.type('text/plain'); 
   res.status(404);
   res.send('404 - Not Found');
  });
 
 // App startup
-app.listen(app.get('port'), function() {
+app.listen(app.get('port'), () => {
   console.log('Express started'); 
  });
 
+
 /* =============================================
-GENERAL ROUTING - HTTP
+GENERAL ROUTING - HTTP [unused]
 ================================================ */
 
  /*
