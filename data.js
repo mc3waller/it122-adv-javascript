@@ -13,8 +13,6 @@ const games = [
     {title: 'Unravel Two', developer: 'Coldwood Interactive', genre: 'Puzzle-platformer', year: 2018}
 ];
 
-// exports.games = games
-
 
 /* =============================================
 ARRAY FUNCTIONS
@@ -29,73 +27,68 @@ exports.getAll = () => {
 /* Returns a specific item from the array and its details
 The search term for [title] is passed and the return value is the item with the matching title */
 exports.getGame = (titleSearch) => {
+    if (!titleSearch || titleSearch === "") {
+        return {'value': false, 'message': 'Error - no value entered'}; // Verifies if a value is entered (also excludes empty strings)
+    } else {
     const searchedGame = games.find(games => games.title === titleSearch);
     return searchedGame;
+    }
 };
 
 // // Sample function call
-// console.log(getGame('Bastion'));
+// console.log(this.getGame('Bastion'));
 
 
-// /* Helper function for addGame() that checks if the item already exists
-// Can be ran as an independant function, but only compares the [title] values between items */
-// exports.checkExists = (title) => {
-//     const game = games.getGame(title);
-//     if (game !== undefined) { // If game IS defined ...
-//         return true;
-//     } else { // If the game is NOT defined ...
-//         return false;
-//     }
-// }
+/* Helper function that checks if an item already exists
+Can be ran as an independant function and only compares the [title] values between items */
+exports.checkExists = (title) => {
+    const game = this.getGame(title);
+    if (!game) { // If game IS defined ...
+        return true;
+    } else { // If the game is NOT defined ...
+        return false;
+    }
+}
 
 
-// Adds a new item to the end of the array and outputs a confirmation with its [title]
-exports.addGame = (title, developer, genre, year) => {
-    if ([title, developer, genre, year].includes(undefined)) {
-        console.log('Error - each property must have a value'); // Varifies if a value is entered for all properties
+// Adds a new item (passed as an object) to the end of the array and outputs a confirmation with its [title]
+exports.addGame = (newGame) => {
+    if (!newGame.title) {
+        return {'value': false, 'message': 'Error - the new item must have a title'}; // Varifies if the item includes a title
     } else {
         // const exists = games.checkExists(title);
-        const game = games.find(games => games.title === title);
+        const game = this.getGame(newGame.title); // Runs getGame() on new item's [title] to check if it exists
 
-        if (game == undefined) {
-            games.push({
-            title: title,
-            developer: developer,
-            genre: genre,
-            year: year});
-
-            console.log(`Added game: "${title}"`);
+        if (!game) {
+            games.push(newGame); // If the item does not already exist, add it
+            return {'added': true, 'message': `Added game: "${newGame.title}"`}; // Reports success with a boolean object
         } else {
-            // console.log(`"${title}" already exists!`);
-            return;
+            return {'added': false, 'message': `"${newGame.title}" already exists`}; // Reports failure with a boolean object
         }
     }
 }
 
 // // Sample function call
-// addGame("Amnesia the Dark Descent", "Frictional Games", "Survival horror", 2010);
-// addGame("Bastion", "Supergiant Games", "Action role-playing", 2011);
+// this.addGame({title:"Amnesia the Dark Descent", developer:"Frictional Games", genre:"Survival horror", year:2010});
+// this.addGame({title: 'Bastion', developer: 'Supergiant Games', genre: 'Action role-playing', year: 2011});
 
 
 /* Removes an item from the array and outputs a confirmation with its [title]
 The [title] of the item is passed as a parameter to retrieve it with getGame() and find its index position
 for the slice() function */
 exports.deleteGame = (title) => {
-    if ([title].includes(undefined) || title === "") {
-        console.log('Error - no value entered') // Verifies if a value is entered (also excludes empty strings)
+    if (!title || title === "") {
+        return {'value': false, 'message': 'Error - no value entered'}; // Verifies if a value is entered (also excludes empty strings)
     } else {
-        const searchedGame = games.find(games => games.title === title); // Reference searched item
-        if (searchedGame == undefined) {
-            console.log('Error - game does not exist'); // Verifies if the item exists
+        const searchedGame = this.getGame(title); // Retrieve and reference searched item
+        if (!searchedGame) {
+            return {'removed': false, 'messge': 'Error - game does not exist'}; // Reports lookup failure with a boolean object
         } else {
             games.splice(games.indexOf(searchedGame), 1); // Finds the index of found item and removes it
-            // console.log(`Removed game: "${title}"`);
+            return {'removed': true, 'messge': `Removed "${searchedGame.title}"`}; // Reports lookup failure with a boolean object
         }
     }
 }
 
 // Sample function call
-// deleteGame('Journey');
-
-
-console.log("Yup, it works!")
+// this.deleteGame('Journey');
