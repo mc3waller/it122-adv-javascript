@@ -6,10 +6,15 @@ MODULE IMPORTS
 
 // Imported modules and their reference variables
 // const http = require('http');
-const games = require('./data');
+// const games = require('./data');
 const express = require("express");
-const bodyParser = require("body-parser")
+const bodyParser = require("body-parser");
 const exphbs = require("express-handlebars");
+
+// Imports the Game schema from the remote database
+const Game = require('./models/game');
+const { db } = require("./models/game");
+const { query } = require("express");
 
 
 /* =============================================
@@ -20,7 +25,7 @@ CONFIGURATIONS & REFERENCES
 const app = express();
 
 // Create reference to getAll() function from the data module to access array items
-const displayGames = games.getAll();
+// const displayGames = games.getAll();
 
 // Template engine (layoutsDir overrides default layout directory)
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
@@ -33,35 +38,44 @@ app.use(bodyParser.urlencoded({extended: true})); // Parse form submissions
 
 
 /* =============================================
-HANDLEBARS ROUTING
+HANDLEBARS ROUTING FROM DATABASE
 ================================================ */
+
+// This version runs the find() function on documents within the Game collection to retrieve the requested data
 
 /* Retrieves, processes, and sends content to the 'home' template
 Similar to setting status code, content type, and sending HTML contet all at once */
-app.get('/', (req, res) => {
-  res.render('home', { gamesList: displayGames}); // Context object that sends the data array to 'home'
+app.get('/', (req, res, next) => {
+  return Game.find({}).lean().then((games) => { // Finds all data within the collection and returns a reference
+    res.render('home', { games }); // Renders 'home' page, passing the data reference to the view
+  }).catch(err => next(err)); // Error response
 });
 
-// Sends content to the 'details' view
-app.get('/details', (req, res) => {
-  // Create reference to an array item by running getGame() with the provided query value in details?title=[value]
-  let result = games.getGame(req.query.title);
-  // Context objects for specified item's [title] and its data acquired with getGame()
-  res.render('details', {title: req.query.title, game: result});
+// Sends content to the 'details' template
+app.get('/details', (req, res, next) => {
+  return Game.findOne({title: req.query.title}).lean().then((game) => { // Finds data matching the requested [title] and returns a reference
+    res.render('details', { title: game.title, game }); // Renders 'details' page, passing the data reference to the view (page title and data)
+  }).catch(err => next(err)); // Error response
 });
+
+// Deletes specified document from the collection by its [title] 
+app.get('/delete', (req, res) => {
+  db.Game.remove({title: req.query.title})
+  WriteResult({'nRemoved': 1})
+})
 
 
 /* =============================================
-GENERAL ROUTING - EXPRESS
+GENERAL ROUTING - MODIFIED FOR REMOTE DATABASE
 ================================================ */
 
-// Send static file as response
-app.get('/', (req, res) => {
-  res.type('text/html');
-  res.sendFile(__dirname + '/public/home.html'); 
- });
+// // home route
+// app.get('/', (req, res) => {
+//   res.type('text/html');
+//   res.sendFile(__dirname + '/public/home.html'); 
+//  });
 
-// Send plain text response
+// detail route
 app.get('/about', (req, res) => {
   res.type('text/plain');
   res.send("About page\n" + "My name is Malik and I'm in my second year at SCC, slowly but surely grinding away for that programming certificate.");
@@ -78,6 +92,35 @@ app.use( (req, res) => {
 app.listen(app.get('port'), () => {
   console.log('Express started'); 
  });
+
+
+/* =============================================
+GENERAL ROUTING - EXPRESS [unussed]
+================================================ */
+
+// // Send static file as response
+// app.get('/', (req, res) => {
+//   res.type('text/html');
+//   res.sendFile(__dirname + '/public/home.html'); 
+//  });
+
+// // Send plain text response
+// app.get('/about', (req, res) => {
+//   res.type('text/plain');
+//   res.send("About page\n" + "My name is Malik and I'm in my second year at SCC, slowly but surely grinding away for that programming certificate.");
+//  });
+
+// // Define 404 handler, responding to all other requests
+// app.use( (req, res) => {
+//   res.type('text/plain'); 
+//   res.status(404);
+//   res.send('404 - Not Found');
+//  });
+
+// // App startup
+// app.listen(app.get('port'), () => {
+//   console.log('Express started'); 
+//  });
 
 
 /* =============================================

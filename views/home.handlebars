@@ -3,7 +3,7 @@
     {{!-- For each item in [gamesList: displayGames] ...
     Create a list item element with the item's [title] and a link to its details page, using its [title] for the query value to get there --}}
     <ul>
-    {{#each gamesList }}
+    {{#each games }}
             <li>
                 <a href="/details?title={{ title }}">{{ title }}</a>
             </li>

@@ -1,2 +1,4 @@
 #ignore files installed by npm
 node_modules
+dbcredentials.js
+test_db.js
