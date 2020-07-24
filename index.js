@@ -13,8 +13,7 @@ const exphbs = require("express-handlebars");
 
 // Imports the Game schema from the remote database
 const Game = require('./models/game');
-const { db } = require("./models/game");
-const { query } = require("express");
+const { assert } = require("chai");
 
 
 /* =============================================
@@ -53,16 +52,25 @@ app.get('/', (req, res, next) => {
 
 // Sends content to the 'details' template
 app.get('/details', (req, res, next) => {
-  return Game.findOne({title: req.query.title}).lean().then((game) => { // Finds data matching the requested [title] and returns a reference
-    res.render('details', { title: game.title, game }); // Renders 'details' page, passing the data reference to the view (page title and data)
+  return Game.findOne({title: req.query.title}).lean().then((game) => { // Finds collection matching requested [title] and returns a reference
+    res.render('details', { title: game.title, game }); // Renders 'details' page, passing data reference to the view ({page title, data})
   }).catch(err => next(err)); // Error response
 });
 
-// Deletes specified document from the collection by its [title] 
+// Deletes a document from the collection specified by its [title] 
 app.get('/delete', (req, res) => {
-  db.Game.remove({title: req.query.title})
-  WriteResult({'nRemoved': 1})
-})
+  Game.findOneAndDelete({title: req.query.title}, (err, game) => { // Finds collection matching the requested [title] and creates a reference
+    if (err) {
+      console.log(err); // Error response
+    } else if (!game) {
+      console.log('Error - game does not exist'); // Error response if the item does not exist
+      res.send('Error - game does not exist');
+    } else {
+      console.log(`Removed "${game.title}"`); // Success response if the item is found and removed
+      res.send(`Removed "${game.title}"`);
+    }
+  });
+});
 
 
 /* =============================================
