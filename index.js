@@ -74,10 +74,10 @@ app.get('/api/games/:title', (req, res) => {
 
 // add/update item API route
 app.post('api/games/add', (req, res) => {
-  const newGame = {title:'Little Nightmares', developer: 'Tarsier Studios', genre: 'Puzzle-platformer', year: 2017}
-  Game.update({title: 'Little Nightmares'}, newGame, {upsert: true}, (err, result) => {
+  const newGame = req.body
+  Game.update({title: newGame.title}, newGame, {upsert: true}, (err, result) => {
     if (err) return next(err);
-    send.json(result)
+    console.log(newGame)
   })
 })
 
