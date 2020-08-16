@@ -1,0 +1,110 @@
+<html>
+<head>
+    <title>React App Demo</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+
+<div id="root"></div>
+<script type="text/babel">
+
+    // Displays database items as an array from which their details can be access
+    const GameList = (props) => {
+      // Maps the collection to a new array
+      const newGamesArray = props.games.map((game) => {
+        // Assigns each item's database ID as its key and adds a click handler to identify the clicked item as the "selected item"
+        return <li key={game._id}><a href="#" onClick={props.handleClick}>{game.title}</a></li>
+      });
+      // Returns the new array within a bullet list
+      return <ul>{newGamesArray}</ul>
+    }
+
+    // Displays details of the selected item
+    const GameDetail = (props) => {
+      return (
+        <div>
+          <h3>Details for "{props.selected.title}"</h3>
+            <ul>
+              <li><strong>Developer:</strong> {props.selected.developer}</li>
+              <li><strong>Genre:</strong> {props.selected.genre}</li>
+              <li><strong>Year:</strong> {props.selected.year}</li>
+            </ul>
+        </div>
+      )
+    }
+
+    class App extends React.Component {
+      constructor(props) {
+          super(props);
+          // Set initial state using data from server application
+          this.state = {
+            games: {{{ games }}}, // Database items; the state is the database collection
+            currentGame: { } // Current selected item; the state is the selected item
+          };
+
+          // Binds application state to click handler
+          this.selectItem = this.selectItem.bind(this);
+       }
+
+      // Handle selected item
+      selectItem(e) {
+        // e.target is the HTML item selected
+        e.preventDefault(); // Prevent default behavior
+        console.log(e.target.innerText)
+        // Retrieves the item from the database matching the [title] text of the item selected
+        let selected = this.state.games.find((game) => {
+          return game.title === e.target.innerText;
+        });
+        console.log(selected);
+        // Sets currentGame state to the selected game
+        this.setState({currentGame: selected})
+      }
+
+      // Renders app UI elements
+      render() {
+        // If currentGame has no value...
+        if(Object.entries(this.state.currentGame).length === 0 ) {
+          // Display the item list by default
+          return (
+            <div>
+              <h2>Indie Games</h2>
+                <GameList games={this.state.games} handleClick={this.selectItem} />
+            </div>
+          );
+        // Otherwise ...
+        } else {
+          // Display the item that matches the value of currentGame and provide a link to the default list
+          return (
+            <div>
+              <GameDetail selected={this.state.currentGame} />
+              <p><a href="/">Return to List</a></p>
+            </div>
+          );
+        };
+      };
+    };
+
+    ReactDOM.render(
+      <App />,
+      document.getElementById('root')
+    );
+    
+</script>
+</body>
+</html>
+
+      {{!-- render() {
+        // Renders app UI elements
+        return (
+          <div>
+            <h2>Components go here</h2>
+            <GameList games={this.state.games} handleClick={this.selectItem} />
+            <hr />
+            <GameDetail selected={this.state.currentGame} />
+          </div>
+          );
+      } --}}

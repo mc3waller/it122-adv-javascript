@@ -35,6 +35,8 @@ app.set('port', process.env.PORT || 3000); // Use this port
 app.use(express.static(__dirname + '/public')); // Set location for static files
 app.use(bodyParser.urlencoded({extended: true})); // Parse form submissions
 
+app.use(bodyParser.json());
+
 // Configuration for API
 app.use('/api', require('cors')());
 
@@ -110,7 +112,7 @@ HANDLEBARS ROUTING FROM DATABASE
 Similar to setting status code, content type, and sending HTML contet all at once */
 app.get('/', (req, res, next) => {
   return Game.find({}).lean().then((games) => { // Finds all data within the collection and returns a reference
-    res.render('home', { games }); // Renders 'home' page, passing the data reference to the view
+    res.render('home_react', {games: JSON.stringify(games)}); // Renders 'home' page, passing the data reference to the view
   }).catch(err => next(err)); // Error response
 });
 
