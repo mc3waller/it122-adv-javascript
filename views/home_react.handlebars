@@ -27,12 +27,16 @@
     const GameDetail = (props) => {
       return (
         <div>
-          <h3>Details for "{props.selected.title}"</h3>
-            <ul>
-              <li><strong>Developer:</strong> {props.selected.developer}</li>
-              <li><strong>Genre:</strong> {props.selected.genre}</li>
-              <li><strong>Year:</strong> {props.selected.year}</li>
-            </ul>
+          <h3>Details for {props.selected.title}</h3>
+            <form>
+              Title: <input type="text" name="title" value={props.selected.title || ""} onChange={props.edit} /><br/>
+              Developer: <input type="text" name="developer" value={props.selected.developer || ""} onChange={props.edit} /><br/>
+              Genre: <input type="text" name="genre" value={props.selected.genre || ""} onChange={props.edit} /><br/>
+              Year: <input type="text" name="year" value={props.selected.year || ""} onChange={props.edit} />
+            </form>
+            <br/>
+            <button onClick={props.resetSelection}>Clear</button>
+            <button onClick={props.handleDelete}>Delete</button>
         </div>
       )
     }
@@ -45,46 +49,69 @@
             games: {{{ games }}}, // Database items; the state is the database collection
             currentGame: { } // Current selected item; the state is the selected item
           };
-
           // Binds application state to click handler
           this.selectItem = this.selectItem.bind(this);
-       }
+          this.resetSelection = this.resetSelection.bind(this);
+          this.edit = this.edit.bind(this);
+          this.handleDelete = this.handleDelete.bind(this);
+      }
+
+      handleDelete () {
+        console.log('handleDelete')
+        fetch(`/api/games/delete/${this.state.currentGame.title}`)
+          .then((response) => {
+              return response.json();
+            })
+            .then((result) => {
+              console.log(result) 
+            })
+            .catch(err => console.log(err))
+      }
+
+      edit (e) {
+        console.log(e.target.value)
+
+        let newGame = this.state.currentGame;
+        newGame[e.target.name] = e.target.value;
+        this.setState({currentGame: newGame});
+      }
+
+      resetSelection() {
+        console.log('reset')
+
+        this.setState({currentGame: { } });
+      }
 
       // Handle selected item
       selectItem(e) {
         // e.target is the HTML item selected
         e.preventDefault(); // Prevent default behavior
         console.log(e.target.innerText)
+
         // Retrieves the item from the database matching the [title] text of the item selected
         let selected = this.state.games.find((game) => {
           return game.title === e.target.innerText;
         });
         console.log(selected);
         // Sets currentGame state to the selected game
-        this.setState({currentGame: selected})
+        this.setState({currentGame: selected});
       }
 
       // Renders app UI elements
       render() {
-        // If currentGame has no value...
-        if(Object.entries(this.state.currentGame).length === 0 ) {
-          // Display the item list by default
-          return (
-            <div>
-              <h2>Indie Games</h2>
-                <GameList games={this.state.games} handleClick={this.selectItem} />
-            </div>
-          );
-        // Otherwise ...
-        } else {
-          // Display the item that matches the value of currentGame and provide a link to the default list
-          return (
-            <div>
-              <GameDetail selected={this.state.currentGame} />
-              <p><a href="/">Return to List</a></p>
-            </div>
-          );
-        };
+        return (
+        <div>
+          <h2>Indie Games</h2>
+            <GameList games={this.state.games} handleClick={this.selectItem} />
+          <hr />
+            <GameDetail
+              selected={this.state.currentGame}
+              resetSelection={() => this.resetSelection()}
+              edit={this.edit}
+              handleDelete={this.handleDelete}
+            />
+        </div>
+        )
       };
     };
 
@@ -108,3 +135,5 @@
           </div>
           );
       } --}}
+
+      {{!-- <p><a href="/">Return to List</a></p> --}}
