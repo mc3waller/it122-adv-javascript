@@ -86,7 +86,7 @@ app.post('/api/games/add', (req, res) => {
 })
 
 // Delete single document
-app.delete('/api/games/delete/:title', (req, res) => {
+app.get('/api/games/delete/:title', (req, res) => {
   const title = req.params.title
   Game.deleteOne({title: title})
   .then((game) => { // Retrieves the document requested by [title] and returns it to the main function
