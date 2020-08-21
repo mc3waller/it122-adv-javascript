@@ -23,16 +23,16 @@
       return <ul>{newGamesArray}</ul>
     }
 
-    // Displays details of the selected item
+    // Displays details of the selected item and button controls
     const GameDetail = (props) => {
       return (
         <div>
           <h3>Details for {props.selected.title}</h3>
             <form>
-              Title: <input type="text" name="title" value={props.selected.title || ""} onChange={props.edit} /><br/>
-              Developer: <input type="text" name="developer" value={props.selected.developer || ""} onChange={props.edit} /><br/>
-              Genre: <input type="text" name="genre" value={props.selected.genre || ""} onChange={props.edit} /><br/>
-              Year: <input type="text" name="year" value={props.selected.year || ""} onChange={props.edit} />
+              Title: <input type="text" name="title" value={props.selected.title || ""} onChange={props.handleEdit} /><br/>
+              Developer: <input type="text" name="developer" value={props.selected.developer || ""} onChange={props.handleEdit} /><br/>
+              Genre: <input type="text" name="genre" value={props.selected.genre || ""} onChange={props.handleEdit} /><br/>
+              Year: <input type="text" name="year" value={props.selected.year || ""} onChange={props.handleEdit} />
             </form>
             <br/>
             <button onClick={props.resetSelection}>Clear</button>
@@ -49,35 +49,43 @@
             games: {{{ games }}}, // Database items; the state is the database collection
             currentGame: { } // Current selected item; the state is the selected item
           };
-          // Binds application state to click handler
+          // Binds application state to click handlers
           this.selectItem = this.selectItem.bind(this);
           this.resetSelection = this.resetSelection.bind(this);
-          this.edit = this.edit.bind(this);
+          this.handleEdit = this.handleEdit.bind(this);
           this.handleDelete = this.handleDelete.bind(this);
       }
 
       handleDelete () {
-        console.log('handleDelete')
+        console.log(`Deleted ${this.state.currentGame.title}`)
+        
+        // Retrieves, returns and deletes the current item by its [title]
         fetch(`/api/games/delete/${this.state.currentGame.title}`)
           .then((response) => {
               return response.json();
             })
             .then((result) => {
-              console.log(result) 
+              console.log(result)
+
+              // Dynamically adjusts the displayed list with the item filtered out whose title matches that of the retrieved item
+              this.setState({games: this.state.games.filter(game => game.title !== this.state.currentGame.title) })
+              // Resets the item selection
+              this.resetSelection();
             })
             .catch(err => console.log(err))
       }
 
-      edit (e) {
+      handleEdit(e) {
         console.log(e.target.value)
 
-        let newGame = this.state.currentGame;
-        newGame[e.target.name] = e.target.value;
-        this.setState({currentGame: newGame});
+        let newGame = this.state.currentGame; // Copies the state of the selected item in a variable
+        newGame[e.target.name] = e.target.value; // Edits the state copy (can't be changed itself)
+        this.setState({currentGame: newGame}); // Updates state with the edited copy
       }
 
+      // Clears the state of the current selection
       resetSelection() {
-        console.log('reset')
+        console.log('Form reset')
 
         this.setState({currentGame: { } });
       }
@@ -107,7 +115,7 @@
             <GameDetail
               selected={this.state.currentGame}
               resetSelection={() => this.resetSelection()}
-              edit={this.edit}
+              handleEdit={this.handleEdit}
               handleDelete={this.handleDelete}
             />
         </div>
@@ -123,17 +131,3 @@
 </script>
 </body>
 </html>
-
-      {{!-- render() {
-        // Renders app UI elements
-        return (
-          <div>
-            <h2>Components go here</h2>
-            <GameList games={this.state.games} handleClick={this.selectItem} />
-            <hr />
-            <GameDetail selected={this.state.currentGame} />
-          </div>
-          );
-      } --}}
-
-      {{!-- <p><a href="/">Return to List</a></p> --}}
